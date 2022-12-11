@@ -172,17 +172,23 @@ decode_Unit  =
                     _ -> Json.Decode.fail ("Unexpected Unit: " ++ word)
             )
 
-
--- PRELUDE
-
-
-{-| CustomTypeDef { constructors = [CustomTypeConstructor (TitleCaseDotPhrase "Nothing") [],CustomTypeConstructor (TitleCaseDotPhrase "Just") [ConstructorTypeParam "a"]], name = TypeName "Maybe" ["a"] } -}
 encodeMaybe : (a -> Json.Encode.Value) -> Maybe a -> Json.Encode.Value
 encodeMaybe arga value =
     case value of
-        (Nothing) -> (Json.Encode.list identity [ encodeString "Nothing" ])
-        (Just m0) -> (Json.Encode.list identity [ encodeString "Just", (arga m0) ])
+        Nothing ->
+            Json.Encode.null
 
+        Just m0 ->
+            arga m0
+
+
+decodeMaybe : Json.Decode.Decoder a -> Json.Decode.Decoder (Maybe a)
+decodeMaybe arga =
+    Json.Decode.maybe arga
+
+
+
+-- PRELUDE
 
 
 {-| CustomTypeDef { constructors = [CustomTypeConstructor (TitleCaseDotPhrase "Err") [ConstructorTypeParam "x"],CustomTypeConstructor (TitleCaseDotPhrase "Ok") [ConstructorTypeParam "a"]], name = TypeName "Result" ["x","a"] } -}
@@ -191,21 +197,6 @@ encodeResult argx arga value =
     case value of
         (Err m0) -> (Json.Encode.list identity [ encodeString "Err", (argx m0) ])
         (Ok m0) -> (Json.Encode.list identity [ encodeString "Ok", (arga m0) ])
-
-{-| CustomTypeDef { constructors = [CustomTypeConstructor (TitleCaseDotPhrase "Nothing") [],CustomTypeConstructor (TitleCaseDotPhrase "Just") [ConstructorTypeParam "a"]], name = TypeName "Maybe" ["a"] } -}
-decodeMaybe : (Json.Decode.Decoder (a)) -> Json.Decode.Decoder (Maybe a)
-decodeMaybe arga =
-    Json.Decode.index 0 Json.Decode.string
-        |> Json.Decode.andThen
-            (\word ->
-                case word of
-                    "Nothing" -> (Json.Decode.succeed Nothing)
-                    "Just" -> (Json.Decode.succeed Just |> (Json.Decode.map2 (|>) ((Json.Decode.index 1 (arga)))))
-                    _ -> Json.Decode.fail ("Unexpected Maybe: " ++ word)
-            )
-                 
-
-
 
 {-| CustomTypeDef { constructors = [CustomTypeConstructor (TitleCaseDotPhrase "Err") [ConstructorTypeParam "x"],CustomTypeConstructor (TitleCaseDotPhrase "Ok") [ConstructorTypeParam "a"]], name = TypeName "Result" ["x","a"] } -}
 decodeResult : (Json.Decode.Decoder (x)) -> (Json.Decode.Decoder (a)) -> Json.Decode.Decoder (Result x a)
