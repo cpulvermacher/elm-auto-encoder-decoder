@@ -11,6 +11,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "elm": "^0.19.1-5",
     "elm-test": "^0.19.1-revision4",
     "elm-verify-examples": "^5.0.0"
   },
