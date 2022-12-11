@@ -184,6 +184,21 @@ decode_Unit  =
                     _ -> Json.Decode.fail ("Unexpected Unit: " ++ word)
             )
 
+encodeMaybe : (a -> Json.Encode.Value) -> Maybe a -> Json.Encode.Value
+encodeMaybe arga value =
+    case value of
+        Nothing ->
+            Json.Encode.null
+
+        Just m0 ->
+            arga m0
+
+
+decodeMaybe : Json.Decode.Decoder a -> Json.Decode.Decoder (Maybe a)
+decodeMaybe arga =
+    Json.Decode.maybe arga
+
+
 
 -- PRELUDE
 

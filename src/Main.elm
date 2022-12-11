@@ -109,11 +109,6 @@ stdlib =
     let
         data =
             """
-
-type Maybe a
-    = Nothing
-    | Just a
-
 type Result x a
     = Err x
     | Ok a
